@@ -1,0 +1,9 @@
+name: Tests
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  flake8:
+    container: python:3.8
+    steps:
+      - run: pip install flake8
+      - run: flake8 bot.py
