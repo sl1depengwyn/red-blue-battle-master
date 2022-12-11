@@ -58,7 +58,7 @@ def setup_flower(config):
 
 def create_env(config):
     conf_path = os.path.join(BASE_DIR, 'config.yml')
-    config = yaml.load(open(conf_path), Loader=yaml.FullLoader)
+    yaml.load(open(conf_path), Loader=yaml.FullLoader)
     env_path = os.path.join(BASE_DIR, 'checkers/', 'checker_venv/')
     if not os.path.exists(env_path):
         virtualenv.create_environment(env_path)

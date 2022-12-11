@@ -20,7 +20,7 @@ def generate_string(N):
 def check(ip):
     try:
         r = requests.get('http://' + ip + ":8616", timeout=5)
-    except requests.exceptions.Timeout as e:
+    except requests.exceptions.Timeout:
         return {"status": NO_CONNECT,
                 "error": "Got a timeout while accessing server."}
     except:
@@ -43,7 +43,7 @@ def put(ip, flag_id, flag):
     try:
         r = requests.post('http://%s:8616/create' %
                           ip, data=payload, timeout=5)
-    except requests.exceptions.Timeout as e:
+    except requests.exceptions.Timeout:
         return {"status": NO_CONNECT,
                 "error": "Got a timeout while accessing server.",
                 "flag_id": flag_id, "key": key}
@@ -63,13 +63,13 @@ def get(ip, flag_id, flag):
 
     try:
         r = requests.post('http://%s:8616/note' % ip, data=payload, timeout=5)
-    except requests.exceptions.Timeout as e:
+    except requests.exceptions.Timeout:
         return {"status": NO_CONNECT,
                 "error": "Got a timeout while accessing server."}
     except:
         return {"status": NO_CONNECT, "error": "Could not access server."}
     try:
-        text = str(r.text)
+        str(r.text)
     except:
         return {"status": MUMBLE, "error": "Doesn't return flag properly."}
     if str(r.text) != flag:

@@ -24,14 +24,13 @@ class WebSocket(tornado.websocket.WebSocketHandler):
         tasks = db.models.Task.select()
         for task in tasks:
             task_name = task.name
-            task_status = task.status
             count_of_flags = db.models.Submit.select().where(
                 db.models.Submit.flag in db.models.Flag.select().where(
                     db.models.Flag.task == task)).count()
             task_sla = round((db.models.Check.select().where(
                 db.models.Check.command == 'get' and
                 db.models.Check.status == 101).count() / rounds) * 100,
-                             2)
+                2)
             tasks_data.append(
                 {'task_name': task_name, 'count_of_flags': count_of_flags,
                  'status': task.status, 'sla': task_sla})

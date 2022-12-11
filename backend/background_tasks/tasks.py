@@ -189,9 +189,9 @@ def process_round():
     tasks = db.models.Task.select()
 
     for task in tasks:
-        c = chain(check_action.s(task.id, game.round),
-                  put_action.s(task.id, game.round),
-                  get_action.s(task.id, game.round)).apply_async()
+        chain(check_action.s(task.id, game.round),
+              put_action.s(task.id, game.round),
+              get_action.s(task.id, game.round)).apply_async()
 
     game.round += 1
     game.save()
