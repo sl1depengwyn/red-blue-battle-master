@@ -2,6 +2,7 @@ version: "3.7"
 
 volumes:
   react_build:
+  grafana-storage:
 
 services:
   setup:
@@ -117,3 +118,26 @@ services:
     links:
       - flower
       - api
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+     - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - grafana-storage:/var/lib/grafana
+    
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:0.4.2
+    command:
+      - -nginx.scrape-uri
+      - http://host.docker.internal:8080/stub_status
+    depends_on:
+      - prometheus
