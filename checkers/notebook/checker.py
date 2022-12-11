@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import requests
 import random
 import string
 import sys
+
+import requests
 
 OK = 101
 NO_FLAG = 102

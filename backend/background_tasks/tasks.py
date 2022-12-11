@@ -1,12 +1,12 @@
-from celery import shared_task, chain
-from celery.signals import worker_ready
-from celery.utils.log import get_task_logger
-from .checker import run_check, run_get, run_put, task_status
-import requests
-import db
-import cfg
-import secrets
 import random
+import secrets
+
+import cfg
+import db
+from celery.signals import worker_ready
+
+from celery import shared_task, chain
+from .checker import run_check, run_get, run_put, task_status
 
 
 @shared_task

@@ -1,11 +1,9 @@
-import tornado.ioloop
-import tornado.web
-import tornado.websocket
-import tornado.httpserver
-import db
 import json
-import datetime
+
+import tornado.httpserver
 from tornado.ioloop import PeriodicCallback
+
+import db
 
 loop = tornado.ioloop.IOLoop.instance()
 
@@ -28,13 +26,18 @@ class WebSocket(tornado.websocket.WebSocketHandler):
             task_name = task.name
             task_status = task.status
             count_of_flags = db.models.Submit.select().where(
-                db.models.Submit.flag in db.models.Flag.select().where(db.models.Flag.task == task)).count()
+                db.models.Submit.flag in db.models.Flag.select().where(
+                    db.models.Flag.task == task)).count()
             task_sla = round((db.models.Check.select().where(
-                db.models.Check.command == 'get' and db.models.Check.status == 101).count() / rounds) * 100, 2)
+                db.models.Check.command == 'get' and
+                db.models.Check.status == 101).count() / rounds) * 100,
+                             2)
             tasks_data.append(
-                {'task_name': task_name, 'count_of_flags': count_of_flags, 'status': task.status, 'sla': task_sla})
+                {'task_name': task_name, 'count_of_flags': count_of_flags,
+                 'status': task.status, 'sla': task_sla})
         return self.write_message(json.dumps(
-            {'team_attacker': team_attacker, 'team_defencer': team_defencer, 'score': score, 'round': rounds,
+            {'team_attacker': team_attacker, 'team_defencer': team_defencer,
+             'score': score, 'round': rounds,
              'tasks': tasks_data}))
 
     def open(self):

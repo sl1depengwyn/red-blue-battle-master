@@ -1,8 +1,9 @@
-from peewee import Model, CharField, ForeignKeyField, IntegerField, \
-    BooleanField, IPField, DateTimeField, \
-    PostgresqlDatabase, TextField
 import datetime
+
 import cfg
+from peewee import Model, CharField, ForeignKeyField, IntegerField, \
+    BooleanField, DateTimeField, \
+    PostgresqlDatabase, TextField
 
 db_data = cfg.db_cfg()['postgres']
 db = PostgresqlDatabase(db_data['name'], user=db_data['user'],

@@ -1,8 +1,8 @@
-import subprocess
 import os
-import db
-import cfg
 import secrets
+import subprocess
+
+import db
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

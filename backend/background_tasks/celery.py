@@ -1,7 +1,6 @@
-from celery import Celery
-import os
-import yaml
 import cfg
+
+from celery import Celery
 
 app = Celery(
     __name__,
