@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import requests, random, string, sys
 
-
 OK = 101
 NO_FLAG = 102
 MUMBLE = 103
@@ -50,7 +49,7 @@ def put(ip, flag_id, flag):
 def get(ip, flag_id, flag):
     flag_id, key = flag_id.split('.')
     payload = {'note-name': flag_id, 'key': key}
-    
+
     try:
         r = requests.post('http://%s:8616/note' % ip, data=payload, timeout=5)
     except requests.exceptions.Timeout as e:

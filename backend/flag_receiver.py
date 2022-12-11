@@ -6,6 +6,7 @@ import db
 import json
 import datetime
 
+
 class FlagReceiverSocket(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
@@ -22,6 +23,7 @@ class FlagReceiverSocket(tornado.websocket.WebSocketHandler):
 
     def open(self):
         self.write_message(u'Send us "your" flags (one per line):')
+
 
 if __name__ == "__main__":
     app = tornado.web.Application([

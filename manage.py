@@ -7,6 +7,7 @@ import virtualenv
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 def setup_db(config):
     postgres_env_path = os.path.join(
         BASE_DIR,
@@ -32,6 +33,7 @@ def setup_db(config):
     with open(postgres_env_path, 'w') as f:
         f.write('\n'.join(postgres_config))
 
+
 def setup_flower(config):
     flower_env_path = os.path.join(
         BASE_DIR,
@@ -52,6 +54,7 @@ def setup_flower(config):
     with open(flower_env_path, 'w') as f:
         f.write('\n'.join(flower_config))
 
+
 def create_env(config):
     conf_path = os.path.join(BASE_DIR, 'config.yml')
     config = yaml.load(open(conf_path), Loader=yaml.FullLoader)
@@ -62,12 +65,14 @@ def create_env(config):
         cmd = f"source {env_path}/bin/activate && pip install -r {os.path.join(BASE_DIR, 'checkers/', 'requirements.txt')}"
         os.system(cmd)
 
+
 def setup_config():
     conf_path = os.path.join(BASE_DIR, 'config.yml')
     config = yaml.load(open(conf_path), Loader=yaml.FullLoader)
     setup_db(config)
     setup_flower(config)
     create_env(config)
+
 
 def clear_db():
     data_path = os.path.join(BASE_DIR, 'docker_volumes/postgres')
@@ -77,6 +82,7 @@ def clear_db():
         ['docker-compose', 'down', '-v', '--remove-orphans'],
         cwd=BASE_DIR,
     )
+
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

@@ -6,19 +6,23 @@ import secrets
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 def get_full_path(path):
     return os.path.join(BASE_DIR, 'checkers', path)
 
+
 def task_status(status):
     d = {'UP': 101, 'CORRUPT': 102, 'MUMBLE': 103, 'DOWN': 104, 'CHECKER_ERROR': 110}
-    k = {101: 'UP', 102: 'CORRUPT', 103:'MUMBLE', 104:'DOWN', 110:'CHECKER_ERROR'}
+    k = {101: 'UP', 102: 'CORRUPT', 103: 'MUMBLE', 104: 'DOWN', 110: 'CHECKER_ERROR'}
     return d[status] if status in d.keys() else k[status] if status in k.keys() else 110
+
 
 def get_env():
     env_path = os.path.join(BASE_DIR, 'checkers/', 'checker_venv/')
     env = os.environ.copy()
     env['PATH'] = f"{env_path}:{env['PATH']}"
     return env
+
 
 def run_command_gracefully(*popenargs,
                            input=None,
@@ -72,10 +76,11 @@ def run_command_gracefully(*popenargs,
 
     return subprocess.CompletedProcess(proc.args, retcode, stdout, stderr), killed
 
+
 def run_command(command, timeout, round):
     env = get_env()
     try:
-        result, killed = run_command_gracefully(command,capture_output=True,timeout=timeout,env=env)
+        result, killed = run_command_gracefully(command, capture_output=True, timeout=timeout, env=env)
         try:
             status = result.returncode
             message = result.stdout[:1024].decode().strip()
@@ -91,8 +96,9 @@ def run_command(command, timeout, round):
         error = 'timeout'
         message = 'timeout'
 
-    result = db.models.Check(message=message,error=error,command=str(command),status=status, round=round)
+    result = db.models.Check(message=message, error=error, command=str(command), status=status, round=round)
     return result
+
 
 def run_check(checker_path, host, round, timeout):
     checker_path = get_full_path(checker_path)
@@ -102,7 +108,7 @@ def run_check(checker_path, host, round, timeout):
         host,
     ]
 
-    return run_command(command=check_command,timeout=timeout,round=round)
+    return run_command(command=check_command, timeout=timeout, round=round)
 
 
 def run_put(checker_path, host, flag, vuln, timeout, round):
@@ -118,7 +124,7 @@ def run_put(checker_path, host, flag, vuln, timeout, round):
         str(vuln),
     ]
 
-    return run_command(command=put_command,timeout=timeout, round=round), flag_id
+    return run_command(command=put_command, timeout=timeout, round=round), flag_id
 
 
 def run_get(checker_path, host, flag, timeout, round):
@@ -132,4 +138,4 @@ def run_get(checker_path, host, flag, timeout, round):
         str(flag.vuln),
     ]
 
-    return run_command(command=get_command,timeout=timeout,round=round)
+    return run_command(command=get_command, timeout=timeout, round=round)
