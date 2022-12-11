@@ -1,0 +1,111 @@
+version: "3.7"
+
+volumes:
+  react_build:
+
+services:
+  setup:
+    build:
+      context: .
+      dockerfile: docker_cfg/setup/Dockerfile
+
+  redis:
+    image: redis:5.0.5-alpine
+    restart: on-failure
+    ports:
+      - '6379:6379'
+    sysctls:
+      net.core.somaxconn: 1024
+
+  postgres:
+    image: postgres:11
+    volumes:
+      - ./docker_volumes/postgres/:/var/lib/postgresql/
+    env_file:
+      - ./docker_cfg/postgres/postgres_env.env
+    restart: on-failure
+    ports:
+      - '5432:5432'
+    depends_on:
+      - setup
+
+  celery:
+    build:
+      context: .
+      dockerfile: docker_cfg/celery/Dockerfile
+    volumes:
+      - ./checkers/:/background_tasks/checkers/
+    restart: on-failure
+    links:
+      - "postgres:postgres"
+    depends_on:
+      - postgres
+
+  celerybeat:
+    build:
+      context: .
+      dockerfile: docker_cfg/celerybeat/Dockerfile
+    restart: on-failure
+    links:
+      - "postgres:postgres"
+    depends_on:
+      - postgres
+
+  flower:
+    build:
+      context: .
+      dockerfile: docker_cfg/flower/Dockerfile
+    depends_on:
+      - postgres
+    links:
+      - "postgres:postgres"
+    env_file:
+      - docker_cfg/flower/flower_env.env
+    restart: on-failure
+
+  api:
+    build:
+      context: .
+      dockerfile: docker_cfg/api/Dockerfile
+    ports:
+      - 8888:8888
+    restart: on-failure
+    links:
+      - "postgres:postgres"
+
+  flag_receiver:
+    build:
+      context: .
+      dockerfile: docker_cfg/flag_receiver/Dockerfile
+    ports:
+      - 1337:1337
+    restart: on-failure
+    links:
+      - "postgres:postgres"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker_cfg/frontend/Dockerfile
+    links:
+      - "api:api"
+    env_file:
+      - docker_cfg/frontend/env.env
+      
+    volumes:
+      - react_build:/react_build/
+    restart: on-failure
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker_cfg/nginx/Dockerfile
+    volumes:
+      - react_build:/react_build
+    ports:
+      - 80:80
+      
+    restart: on-failure
+    links:
+      - flower
+      - api

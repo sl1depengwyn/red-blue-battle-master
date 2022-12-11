@@ -1,0 +1,47 @@
+game:
+  round_time: 30
+  round_count: 30
+  start_time: 2019-11-16 15:50:00+03:00 
+
+celery:
+  broker_url: redis://redis:6379/1
+  backend_url: redis://redis:6379/1
+  task_serializer: json
+  accept_content:
+    - json
+  result_serializer: json
+  broker_transport_options:
+    visibility_timeout: 36000
+
+  worker_prefetch_multiplier: 1
+
+  timezone: Europe/Moscow
+
+flower:
+  username: username
+  password: password
+
+db:
+  postgres:
+    host: postgres
+    port: 5432
+    user: asdasd
+    password: asd123asd
+    name: test_db
+
+team:
+  - name: "Red team"
+    type: "red"
+    ip: null
+
+  - name: "Blue team"
+    type: "blue"
+    ip: "95.179.181.235"
+
+tasks:
+  - name: notebook
+    checker: notebook/checker.py 
+    gets: 1
+    puts: 1
+    vulns: 1
+    timeout: 10
