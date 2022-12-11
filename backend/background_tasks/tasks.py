@@ -23,7 +23,8 @@ def check_action(task_id, round):
         round=round
     )
 
-    checker_verdict = run_check(checker_path=task.checker, host=team.ip, timeout=task.timeout, round=round)
+    checker_verdict = run_check(
+        checker_path=task.checker, host=team.ip, timeout=task.timeout, round=round)
 
     tmp_verdict.status = checker_verdict.status
     task.status = checker_verdict.status
@@ -63,7 +64,8 @@ def put_action(check_ok, task_id, round):
         )
 
         if checker_verdict.status == task_status('UP'):
-            flag = db.models.Flag.create(flag=flag, flag_id=flag_id, vuln=vuln, task=task, round=round)
+            flag = db.models.Flag.create(
+                flag=flag, flag_id=flag_id, vuln=vuln, task=task, round=round)
         else:
             task.status = checker_verdict.status
             task.save()
@@ -90,7 +92,8 @@ def get_action(put_ok, task_id, round):
     team = db.models.Team.select().where(db.models.Team.type == 'blue').first()
     task = db.models.Task.select().where(db.models.Task.id == task_id).first()
 
-    rounds_to_check = list(x for x in range(round - task.gets, round) if x >= 1)
+    rounds_to_check = list(x for x in range(
+        round - task.gets, round) if x >= 1)
 
     checker_verdict = db.models.Check.create(
         status=task_status('UP'),
@@ -146,7 +149,8 @@ def startup(**_kwargs):
     if db.models.Team.select().count() == 0:
         teams = cfg.team_cfg()
         for team in teams:
-            db.models.Team.create(name=team['name'], type=team['type'], ip=team['ip'])
+            db.models.Team.create(
+                name=team['name'], type=team['type'], ip=team['ip'])
     if db.models.Task.select().count() == 0:
         tasks = cfg.task_cfg()
         for task in tasks:

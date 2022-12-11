@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-import requests, random, string, sys
+import requests
+import random
+import string
+import sys
 
 OK = 101
 NO_FLAG = 102
@@ -35,7 +38,8 @@ def put(ip, flag_id, flag):
     payload = {'note-name': flag_id, 'text': flag, 'key': key}
 
     try:
-        r = requests.post('http://%s:8616/create' % ip, data=payload, timeout=5)
+        r = requests.post('http://%s:8616/create' %
+                          ip, data=payload, timeout=5)
     except requests.exceptions.Timeout as e:
         return {"status": NO_CONNECT, "error": "Got a timeout while accessing server.", "flag_id": flag_id, "key": key}
     except:

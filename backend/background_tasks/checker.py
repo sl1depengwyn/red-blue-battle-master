@@ -12,8 +12,10 @@ def get_full_path(path):
 
 
 def task_status(status):
-    d = {'UP': 101, 'CORRUPT': 102, 'MUMBLE': 103, 'DOWN': 104, 'CHECKER_ERROR': 110}
-    k = {101: 'UP', 102: 'CORRUPT', 103: 'MUMBLE', 104: 'DOWN', 110: 'CHECKER_ERROR'}
+    d = {'UP': 101, 'CORRUPT': 102, 'MUMBLE': 103,
+         'DOWN': 104, 'CHECKER_ERROR': 110}
+    k = {101: 'UP', 102: 'CORRUPT', 103: 'MUMBLE',
+         104: 'DOWN', 110: 'CHECKER_ERROR'}
     return d[status] if status in d.keys() else k[status] if status in k.keys() else 110
 
 
@@ -45,7 +47,8 @@ def run_command_gracefully(*popenargs,
         except subprocess.TimeoutExpired:
             proc.terminate()
             try:
-                stdout, stderr = proc.communicate(input, timeout=terminate_timeout)
+                stdout, stderr = proc.communicate(
+                    input, timeout=terminate_timeout)
             except subprocess.TimeoutExpired:
                 proc.kill()
                 killed = True
@@ -80,7 +83,8 @@ def run_command_gracefully(*popenargs,
 def run_command(command, timeout, round):
     env = get_env()
     try:
-        result, killed = run_command_gracefully(command, capture_output=True, timeout=timeout, env=env)
+        result, killed = run_command_gracefully(
+            command, capture_output=True, timeout=timeout, env=env)
         try:
             status = result.returncode
             message = result.stdout[:1024].decode().strip()
@@ -96,7 +100,8 @@ def run_command(command, timeout, round):
         error = 'timeout'
         message = 'timeout'
 
-    result = db.models.Check(message=message, error=error, command=str(command), status=status, round=round)
+    result = db.models.Check(message=message, error=error, command=str(
+        command), status=status, round=round)
     return result
 
 

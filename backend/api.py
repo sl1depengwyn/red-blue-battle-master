@@ -16,8 +16,10 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
     def game_info(self):
         game = db.models.Game.select().first()
-        team_attacker = db.models.Team.select().where(db.models.Team.type == 'red').first().name
-        team_defencer = db.models.Team.select().where(db.models.Team.type == 'blue').first().name
+        team_attacker = db.models.Team.select().where(
+            db.models.Team.type == 'red').first().name
+        team_defencer = db.models.Team.select().where(
+            db.models.Team.type == 'blue').first().name
         score = game.score
         rounds = game.round or 1
         tasks_data = []
@@ -37,7 +39,8 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
     def open(self):
         self.game_info()
-        self.callback = PeriodicCallback(callback_time=5000, callback=self.game_info)
+        self.callback = PeriodicCallback(
+            callback_time=5000, callback=self.game_info)
         self.callback.start()
 
 

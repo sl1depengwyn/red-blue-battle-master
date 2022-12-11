@@ -26,7 +26,8 @@ def setup_db(config):
         'POSTGRES_HOST={postgres_host}'.format(postgres_host=postgres_host),
         'POSTGRES_PORT={postgres_port}'.format(postgres_port=postgres_port),
         'POSTGRES_USER={postgres_user}'.format(postgres_user=postgres_user),
-        'POSTGRES_PASSWORD={postgres_password}'.format(postgres_password=postgres_password),
+        'POSTGRES_PASSWORD={postgres_password}'.format(
+            postgres_password=postgres_password),
         'POSTGRES_DB={postgres_db}'.format(postgres_db=postgres_db),
     ]
 
