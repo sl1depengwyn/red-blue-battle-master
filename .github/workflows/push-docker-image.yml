@@ -26,11 +26,74 @@ jobs:
         with:
           images: nikitosing/red-blue-battle-master
       
-      - name: Build and push Docker image
+      - name: Build and push setup Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
           file: docker_cfg/setup/Dockerfile
           push: true
           tags: nikitosing/red-blue-battle-master:setup
+          labels: ${{ steps.meta.outputs.labels }}
+      
+      - name: Build and push celery Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: docker_cfg/celery/Dockerfile
+          push: true
+          tags: nikitosing/red-blue-battle-master:celery
+          labels: ${{ steps.meta.outputs.labels }}
+      
+      - name: Build and push celerybeat Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: docker_cfg/celerybeat/Dockerfile
+          push: true
+          tags: nikitosing/red-blue-battle-master:celerybeat
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push flower Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: docker_cfg/flower/Dockerfile
+          push: true
+          tags: nikitosing/red-blue-battle-master:flower
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push api Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: docker_cfg/api/Dockerfile
+          push: true
+          tags: nikitosing/red-blue-battle-master:api
+          labels: ${{ steps.meta.outputs.labels }}
+      
+      - name: Build and push flag_receiver Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: docker_cfg/flag_receiver/Dockerfile
+          push: true
+          tags: nikitosing/red-blue-battle-master:flag_receiver
+          labels: ${{ steps.meta.outputs.labels }}
+      
+      - name: Build and push frontend Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: docker_cfg/frontend/Dockerfile
+          push: true
+          tags: nikitosing/red-blue-battle-master:frontend
+          labels: ${{ steps.meta.outputs.labels }}
+      
+      - name: Build and push nginx Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: docker_cfg/nginx/Dockerfile
+          push: true
+          tags: nikitosing/red-blue-battle-master:nginx
           labels: ${{ steps.meta.outputs.labels }}

@@ -5,6 +5,7 @@ volumes:
 
 services:
   setup:
+    image: nikitosing/red-blue-battle-master:setup
     build:
       context: .
       dockerfile: docker_cfg/setup/Dockerfile
@@ -30,6 +31,7 @@ services:
       - setup
 
   celery:
+    image: nikitosing/red-blue-battle-master:celery
     build:
       context: .
       dockerfile: docker_cfg/celery/Dockerfile
@@ -42,6 +44,7 @@ services:
       - postgres
 
   celerybeat:
+    image: nikitosing/red-blue-battle-master:celerybeat
     build:
       context: .
       dockerfile: docker_cfg/celerybeat/Dockerfile
@@ -52,6 +55,7 @@ services:
       - postgres
 
   flower:
+    image: nikitosing/red-blue-battle-master:flower
     build:
       context: .
       dockerfile: docker_cfg/flower/Dockerfile
@@ -64,6 +68,7 @@ services:
     restart: on-failure
 
   api:
+    image: nikitosing/red-blue-battle-master:api
     build:
       context: .
       dockerfile: docker_cfg/api/Dockerfile
@@ -74,6 +79,7 @@ services:
       - "postgres:postgres"
 
   flag_receiver:
+    image: nikitosing/red-blue-battle-master:flag_receiver
     build:
       context: .
       dockerfile: docker_cfg/flag_receiver/Dockerfile
@@ -84,6 +90,7 @@ services:
       - "postgres:postgres"
 
   frontend:
+    image: nikitosing/red-blue-battle-master:frontend
     build:
       context: .
       dockerfile: docker_cfg/frontend/Dockerfile
@@ -97,6 +104,7 @@ services:
     restart: on-failure
 
   nginx:
+    image: nikitosing/red-blue-battle-master:nginx
     build:
       context: .
       dockerfile: docker_cfg/nginx/Dockerfile
