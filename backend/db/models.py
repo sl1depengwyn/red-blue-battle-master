@@ -1,10 +1,12 @@
-from peewee import Model, CharField, ForeignKeyField, IntegerField, BooleanField, IPField, DateTimeField, \
+from peewee import Model, CharField, ForeignKeyField, IntegerField, \
+    BooleanField, IPField, DateTimeField, \
     PostgresqlDatabase, TextField
 import datetime
 import cfg
 
 db_data = cfg.db_cfg()['postgres']
-db = PostgresqlDatabase(db_data['name'], user=db_data['user'], password=db_data['password'], host=db_data['host'],
+db = PostgresqlDatabase(db_data['name'], user=db_data['user'],
+                        password=db_data['password'], host=db_data['host'],
                         port=db_data['port'])
 
 

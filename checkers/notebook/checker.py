@@ -12,14 +12,16 @@ CHECKER_ERROR = 110
 
 
 def generate_string(N):
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
+    return ''.join(
+        random.choice(string.ascii_uppercase + string.digits) for _ in range(N))
 
 
 def check(ip):
     try:
         r = requests.get('http://' + ip + ":8616", timeout=5)
     except requests.exceptions.Timeout as e:
-        return {"status": NO_CONNECT, "error": "Got a timeout while accessing server."}
+        return {"status": NO_CONNECT,
+                "error": "Got a timeout while accessing server."}
     except:
         return {"status": NO_CONNECT, "error": "Could not access server."}
 
@@ -41,12 +43,16 @@ def put(ip, flag_id, flag):
         r = requests.post('http://%s:8616/create' %
                           ip, data=payload, timeout=5)
     except requests.exceptions.Timeout as e:
-        return {"status": NO_CONNECT, "error": "Got a timeout while accessing server.", "flag_id": flag_id, "key": key}
+        return {"status": NO_CONNECT,
+                "error": "Got a timeout while accessing server.",
+                "flag_id": flag_id, "key": key}
     except:
-        return {"status": NO_CONNECT, "error": "Could not access server.", "flag_id": flag_id, "key": key}
+        return {"status": NO_CONNECT, "error": "Could not access server.",
+                "flag_id": flag_id, "key": key}
 
     if r.text != "Note successfully created!":
-        return {"status": MUMBLE, "error": "Got an unexpected response.", "flag_id": flag_id, "key": key}
+        return {"status": MUMBLE, "error": "Got an unexpected response.",
+                "flag_id": flag_id, "key": key}
     return {"status": OK, "flag_id": flag_id, "key": key}
 
 
@@ -57,7 +63,8 @@ def get(ip, flag_id, flag):
     try:
         r = requests.post('http://%s:8616/note' % ip, data=payload, timeout=5)
     except requests.exceptions.Timeout as e:
-        return {"status": NO_CONNECT, "error": "Got a timeout while accessing server."}
+        return {"status": NO_CONNECT,
+                "error": "Got a timeout while accessing server."}
     except:
         return {"status": NO_CONNECT, "error": "Could not access server."}
     try:

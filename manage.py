@@ -63,7 +63,8 @@ def create_env(config):
     if not os.path.exists(env_path):
         virtualenv.create_environment(env_path)
     if os.path.exists(os.path.join(BASE_DIR, 'checkers/', 'requirements.txt')):
-        cmd = f"source {env_path}/bin/activate && pip install -r {os.path.join(BASE_DIR, 'checkers/', 'requirements.txt')}"
+        cmd = f"source {env_path}/bin/activate && pip install -r \
+        {os.path.join(BASE_DIR, 'checkers/', 'requirements.txt')}"
         os.system(cmd)
 
 

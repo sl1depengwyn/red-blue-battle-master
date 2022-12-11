@@ -16,7 +16,8 @@ def task_status(status):
          'DOWN': 104, 'CHECKER_ERROR': 110}
     k = {101: 'UP', 102: 'CORRUPT', 103: 'MUMBLE',
          104: 'DOWN', 110: 'CHECKER_ERROR'}
-    return d[status] if status in d.keys() else k[status] if status in k.keys() else 110
+    return d[status] if status in d.keys() else k[
+        status] if status in k.keys() else 110
 
 
 def get_env():
@@ -77,7 +78,8 @@ def run_command_gracefully(*popenargs,
                 stderr=stderr
             )
 
-    return subprocess.CompletedProcess(proc.args, retcode, stdout, stderr), killed
+    return subprocess.CompletedProcess(proc.args, retcode, stdout,
+                                       stderr), killed
 
 
 def run_command(command, timeout, round):
@@ -129,7 +131,8 @@ def run_put(checker_path, host, flag, vuln, timeout, round):
         str(vuln),
     ]
 
-    return run_command(command=put_command, timeout=timeout, round=round), flag_id
+    return run_command(command=put_command, timeout=timeout,
+                       round=round), flag_id
 
 
 def run_get(checker_path, host, flag, timeout, round):

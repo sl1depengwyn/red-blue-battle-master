@@ -24,7 +24,8 @@ def check_action(task_id, round):
     )
 
     checker_verdict = run_check(
-        checker_path=task.checker, host=team.ip, timeout=task.timeout, round=round)
+        checker_path=task.checker, host=team.ip, timeout=task.timeout,
+        round=round)
 
     tmp_verdict.status = checker_verdict.status
     task.status = checker_verdict.status
@@ -33,7 +34,8 @@ def check_action(task_id, round):
     game = db.models.Game.select().first()
     if task.status == task_status('UP'):
         game.score += 20
-    elif task.status == task_status('CORRUPT') or task.status == task_status('MUMBLE'):
+    elif task.status == task_status('CORRUPT') or task.status == task_status(
+            'MUMBLE'):
         game.score += 5
     else:
         game.score -= 5
@@ -72,12 +74,15 @@ def put_action(check_ok, task_id, round):
             game = db.models.Game.select().first()
             if task.status == task_status('UP'):
                 game.score += 20
-            elif task.status == task_status('CORRUPT') or task.status == task_status('MUMBLE'):
+            elif task.status == task_status(
+                    'CORRUPT') or task.status == task_status('MUMBLE'):
                 game.score += 5
             else:
                 game.score -= 5
-            db.models.Check.create(status=checker_verdict.status, task=task, command='put',
-                                   message=checker_verdict.message, error=checker_verdict.error, round=round)
+            db.models.Check.create(status=checker_verdict.status, task=task,
+                                   command='put',
+                                   message=checker_verdict.message,
+                                   error=checker_verdict.error, round=round)
             ok = False
             break
 
@@ -132,7 +137,8 @@ def get_action(put_ok, task_id, round):
     game = db.models.Game.select().first()
     if task.status == task_status('UP'):
         game.score += 20
-    elif task.status == task_status('CORRUPT') or task.status == task_status('MUMBLE'):
+    elif task.status == task_status('CORRUPT') or task.status == task_status(
+            'MUMBLE'):
         game.score += 5
     else:
         game.score -= 5
@@ -143,7 +149,8 @@ def get_action(put_ok, task_id, round):
 @worker_ready.connect
 def startup(**_kwargs):
     db.models.db.create_tables(
-        [db.models.Check, db.models.Flag, db.models.Game, db.models.Submit, db.models.Task, db.models.Team])
+        [db.models.Check, db.models.Flag, db.models.Game, db.models.Submit,
+         db.models.Task, db.models.Team])
     if db.models.Game.select().count() == 0:
         db.models.Game.create(running=False, score=0, round=0)
     if db.models.Team.select().count() == 0:
@@ -154,8 +161,10 @@ def startup(**_kwargs):
     if db.models.Task.select().count() == 0:
         tasks = cfg.task_cfg()
         for task in tasks:
-            db.models.Task.create(name=task['name'], checker=task['checker'], gets=task['gets'], puts=task['puts'],
-                                  vulns=task['vulns'], timeout=task['timeout'], status=104)
+            db.models.Task.create(name=task['name'], checker=task['checker'],
+                                  gets=task['gets'], puts=task['puts'],
+                                  vulns=task['vulns'], timeout=task['timeout'],
+                                  status=104)
 
     start_game.apply_async(eta=cfg.game_cfg()['start_time'])
 
@@ -179,7 +188,8 @@ def process_round():
     tasks = db.models.Task.select()
 
     for task in tasks:
-        c = chain(check_action.s(task.id, game.round), put_action.s(task.id, game.round),
+        c = chain(check_action.s(task.id, game.round),
+                  put_action.s(task.id, game.round),
                   get_action.s(task.id, game.round)).apply_async()
 
     game.round += 1
