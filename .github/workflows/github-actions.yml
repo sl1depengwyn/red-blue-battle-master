@@ -3,6 +3,7 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
   flake8:
+    runs-on: ubuntu-latest
     container: python:3.8
     steps:
       - run: pip install flake8
