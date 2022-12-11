@@ -118,7 +118,8 @@ def get_action(put_ok, task_id, round):
         if not flag:
             checker_verdict.status = task_status('CORRUPT')
             checker_verdict.error = f'No flags from round {get_round}'
-            checker_verdict.message = f'Could not get flag from round {get_round}'
+            checker_verdict.message = \
+                f'Could not get flag from round {get_round}'
             checker_verdict.save()
         else:
             checker_verdict = run_get(

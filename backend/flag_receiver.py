@@ -8,10 +8,12 @@ class FlagReceiverSocket(tornado.websocket.WebSocketHandler):
         return True
 
     def on_message(self, message):
-        flag = db.models.Flag.select().where(db.models.Flag.flag == message).first()
+        flag = db.models.Flag.select().where(
+            db.models.Flag.flag == message).first()
         game = db.models.Game.select().first()
         if flag and game.running:
-            submit = db.models.Submit.select().where(db.models.Submit.flag == flag).first()
+            submit = db.models.Submit.select().where(
+                db.models.Submit.flag == flag).first()
             if not submit:
                 db.models.Submit.create(flag=flag)
                 game.score -= 5
