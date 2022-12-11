@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - np-add-ga-workflow
 
 jobs:
   push_to_registry:
