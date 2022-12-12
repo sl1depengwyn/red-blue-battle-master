@@ -20,7 +20,7 @@ class board extends Component {
         };
     };
 
-    ws = new WebSocket('ws://192.168.99.108:8888');
+    ws = new WebSocket('ws://localhost:8888');
 
     componentDidMount() {
 
