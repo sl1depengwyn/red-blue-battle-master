@@ -3,108 +3,143 @@ version: "3.7"
 volumes:
   react_build:
   grafana-storage:
+  loki-storage:
+
+networks:
+  red-blue-battle-network:
+    driver: bridge
+
+
+x-logging:
+  &formatted-logging
+  driver: json-file
+  options:
+    tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+    max-size: "10m"
+    max-file: "3"
+    mode: "non-blocking"
+    max-buffer-size: "4m"
+
 
 services:
   setup:
+    container_name: rbb-setup
     image: nikitosing/red-blue-battle-master:setup
     build:
       context: .
       dockerfile: docker_cfg/setup/Dockerfile
+    logging: *formatted-logging
 
   redis:
+    container_name: rbb-redis
     image: redis:5.0.5-alpine
-    restart: on-failure
-    ports:
-      - '6379:6379'
+    restart: unless-stopped
+    networks:
+      - red-blue-battle-network
     sysctls:
       net.core.somaxconn: 1024
+    logging: *formatted-logging
 
   postgres:
+    container_name: rbb-postgres
     image: postgres:11
     volumes:
       - ./docker_volumes/postgres/:/var/lib/postgresql/
     env_file:
       - ./docker_cfg/postgres/postgres_env.env
     restart: on-failure
-    ports:
-      - '5432:5432'
+    networks:
+      - red-blue-battle-network
     depends_on:
       - setup
+    logging: *formatted-logging
 
   celery:
+    container_name: rbb-celery
     image: nikitosing/red-blue-battle-master:celery
     build:
       context: .
       dockerfile: docker_cfg/celery/Dockerfile
     volumes:
       - ./checkers/:/background_tasks/checkers/
-    restart: on-failure
-    links:
-      - "postgres:postgres"
+    restart: unless-stopped
+    networks:
+      - red-blue-battle-network
     depends_on:
       - postgres
+    logging: *formatted-logging
 
   celerybeat:
+    container_name: rbb-celerybeat
     image: nikitosing/red-blue-battle-master:celerybeat
     build:
       context: .
       dockerfile: docker_cfg/celerybeat/Dockerfile
     restart: on-failure
-    links:
-      - "postgres:postgres"
+    networks:
+      - red-blue-battle-network
     depends_on:
       - postgres
+    logging: *formatted-logging
 
   flower:
+    container_name: rbb-flower
     image: nikitosing/red-blue-battle-master:flower
     build:
       context: .
       dockerfile: docker_cfg/flower/Dockerfile
     depends_on:
       - postgres
-    links:
-      - "postgres:postgres"
+    networks:
+      - red-blue-battle-network
     env_file:
       - docker_cfg/flower/flower_env.env
     restart: on-failure
+    logging: *formatted-logging
 
   api:
+    container_name: rbb-api
     image: nikitosing/red-blue-battle-master:api
     build:
       context: .
       dockerfile: docker_cfg/api/Dockerfile
     ports:
-      - 8888:8888
-    restart: on-failure
-    links:
-      - "postgres:postgres"
+      - "8888:8888"
+    restart: unless-stopped
+    networks:
+      - red-blue-battle-network
+    logging: *formatted-logging
 
   flag_receiver:
+    container_name: rbb-flag-receiver
     image: nikitosing/red-blue-battle-master:flag_receiver
     build:
       context: .
       dockerfile: docker_cfg/flag_receiver/Dockerfile
     ports:
-      - 1337:1337
-    restart: on-failure
-    links:
-      - "postgres:postgres"
+      - "1337:1337"
+    restart: unless-stopped
+    networks:
+      - red-blue-battle-network
+    logging: *formatted-logging
 
   frontend:
+    container_name: rbb-frontend
     image: nikitosing/red-blue-battle-master:frontend
     build:
       context: .
       dockerfile: docker_cfg/frontend/Dockerfile
-    links:
-      - "api:api"
     env_file:
       - docker_cfg/frontend/env.env
-      
+    networks:
+      - red-blue-battle-network
     volumes:
       - react_build:/react_build/
     restart: on-failure
+    logging: *formatted-logging
 
   nginx:
+    container_name: rbb-nginx
     image: nikitosing/red-blue-battle-master:nginx
     build:
       context: .
@@ -112,32 +147,74 @@ services:
     volumes:
       - react_build:/react_build
     ports:
-      - 80:80
-      
-    restart: on-failure
-    links:
-      - flower
-      - api
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    networks:
+      - red-blue-battle-network
+    logging: *formatted-logging
+
+# Logging and metrics
 
   prometheus:
+    container_name: rbb-prometheus
     image: prom/prometheus
-    ports:
-     - 9090:9090
+#    ports:
+#     - "9090:9090"
+    networks:
+      - red-blue-battle-network
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker_cfg/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    logging: *formatted-logging
     
   grafana:
-    image: grafana/grafana
+    container_name: rbb-grafana
+    image: grafana/grafana:9.2.1
     ports:
-      - 3000:3000
+      - "3000:3000"
+    networks:
+      - red-blue-battle-network
     volumes:
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./docker_cfg/grafana/grafana.ini:/etc/grafana/grafana.ini
       - grafana-storage:/var/lib/grafana
-    
+    logging: *formatted-logging
+
+  loki:
+    container_name: rbb-loki
+    image: grafana/loki:2.6.1
+    volumes:
+      - ./docker_cfg/loki/loki-config.yaml:/etc/loki/config.yaml
+      - loki-storage:/loki
+    command: -config.file=/etc/loki/config.yaml
+#    ports:
+#      - "3100:3100"
+    restart: always
+    networks:
+      - red-blue-battle-network
+    logging: *formatted-logging
+
+  promtail:
+    container_name: rbb-promtail
+    image: grafana/promtail:2.6.1
+    restart: always
+    volumes:
+      - ./docker_cfg/promtail/promtail-config.yaml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/host/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - red-blue-battle-network
+    logging: *formatted-logging
+
   nginx-exporter:
+    container_name: rbb-nginx-exporter
     image: nginx/nginx-prometheus-exporter:0.4.2
     command:
       - -nginx.scrape-uri
-      - http://host.docker.internal:8080/stub_status
+      - http://nginx:8080/stub_status
+    networks:
+      - red-blue-battle-network
     depends_on:
+      - nginx
       - prometheus
+    restart: always
+    logging: *formatted-logging

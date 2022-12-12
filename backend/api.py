@@ -1,9 +1,13 @@
 import json
 
+import tornado.ioloop
+import tornado.web
+import tornado.websocket
 import tornado.httpserver
-from tornado.ioloop import PeriodicCallback
 
 import db
+
+from tornado.ioloop import PeriodicCallback
 
 loop = tornado.ioloop.IOLoop.instance()
 
@@ -47,6 +51,7 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 
 
 if __name__ == "__main__":
+    print("Starting WebAPI...")
     app = tornado.web.Application([
         (r"/", WebSocket),
     ])
