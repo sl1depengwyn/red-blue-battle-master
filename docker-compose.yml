@@ -1,7 +1,6 @@
 version: "3.7"
 
 volumes:
-  react_build:
   grafana-storage:
   loki-storage:
 
@@ -38,6 +37,11 @@ services:
       - red-blue-battle-network
     sysctls:
       net.core.somaxconn: 1024
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 256M
     logging: *formatted-logging
 
   postgres:
@@ -55,7 +59,6 @@ services:
     logging: *formatted-logging
 
   celery:
-    container_name: rbb-celery
     image: nikitosing/red-blue-battle-master:celery
     build:
       context: .
@@ -67,6 +70,9 @@ services:
       - red-blue-battle-network
     depends_on:
       - postgres
+    deploy:
+      mode: replicated
+      replicas: 3
     logging: *formatted-logging
 
   celerybeat:
@@ -94,6 +100,8 @@ services:
       - red-blue-battle-network
     env_file:
       - docker_cfg/flower/flower_env.env
+    ports:
+      - "9999:5555"
     restart: on-failure
     logging: *formatted-logging
 
@@ -121,21 +129,11 @@ services:
     restart: unless-stopped
     networks:
       - red-blue-battle-network
-    logging: *formatted-logging
-
-  frontend:
-    container_name: rbb-frontend
-    image: nikitosing/red-blue-battle-master:frontend
-    build:
-      context: .
-      dockerfile: docker_cfg/frontend/Dockerfile
-    env_file:
-      - docker_cfg/frontend/env.env
-    networks:
-      - red-blue-battle-network
-    volumes:
-      - react_build:/react_build/
-    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: '0.15'
+          memory: 512M
     logging: *formatted-logging
 
   nginx:
@@ -145,7 +143,7 @@ services:
       context: .
       dockerfile: docker_cfg/nginx/Dockerfile
     volumes:
-      - react_build:/react_build
+      - ./react_build/:/react_build
     ports:
       - "80:80"
       - "443:443"
