@@ -1,6 +1,7 @@
 version: "3.7"
 
 volumes:
+  react_build:
   grafana-storage:
   loki-storage:
 
@@ -136,6 +137,21 @@ services:
           memory: 512M
     logging: *formatted-logging
 
+  frontend:
+    container_name: rbb-frontend
+    image: nikitosing/red-blue-battle-master:frontend
+    build:
+      context: .
+      dockerfile: docker_cfg/frontend/Dockerfile
+    env_file:
+      - docker_cfg/frontend/env.env
+    networks:
+      - red-blue-battle-network
+    volumes:
+      - react_build:/react_build/
+    restart: on-failure
+    logging: *formatted-logging
+
   nginx:
     container_name: rbb-nginx
     image: nikitosing/red-blue-battle-master:nginx
@@ -143,7 +159,7 @@ services:
       context: .
       dockerfile: docker_cfg/nginx/Dockerfile
     volumes:
-      - ./react_build/:/react_build
+      - react_build:/react_build
     ports:
       - "80:80"
       - "443:443"
